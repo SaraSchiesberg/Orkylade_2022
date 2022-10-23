@@ -1,20 +1,21 @@
 ---
 title: "Orkylade 2022 Musterlösung"
 author: "Sara Schiesberg"
-date: "2022-09-23"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   md_document:
   variant: markdown_github
   always_allow_html: true
 ---
 
+# **Musterlösungen für die Orkylade 2022**
 Hier ist eine Musterlösungen für die sportwissenschaftliche Auswertung der Orkylade 2022. 
 Ich folge hier dem Styleguide aus dem Buch [Advanced R](http://adv-r.had.co.nz/Style.html) von Hadley Wickham. 
-Das Skript beginnt mit einem kleinem Codchunk zum Septup. Dann werden die Daten eingelesen und überprüft. 
+Das Skript beginnt mit einem kleinem Codchunk zum Setup. Dann werden die Daten eingelesen und überprüft. 
 
 ```{r setup, message = FALSE}
 # Pakete einlesen
-library(car) # für den Levene-Test
+library(car) # Levene-Test
 library(knitr) # schöne Tabellen
 library(tidyverse) # beinhaltet verschiedene Pakte: z. B. dplyr und ggplot2
 # Default Chunk-Option festlegen
@@ -81,11 +82,11 @@ Um ein geeignetes Testverfahren auszuwählen, gilt es vorab zu klären, ob die D
 # Shapiro-Wilks-Test
 # Vektor mit den Merkmalsausprägungen der kategorialen Variable
 clans <- unique(orks$clan)
-# Nun kann man über diese Merkmalsausräungen iterieren
+# Nun kann man über diese Merkmalsausprägungen iterieren
 for (clan in clans){
   clan_koerp <- filter(orks, clan == clan)
   test <- shapiro.test(clan_koerp$koerperhoehe)
-         test$data.name <- paste("Körperhöhen für den Clan", clan) # Variablennamen für den output umbenannen
+         test$data.name <- paste("Körperhöhen für den Clan", clan) # Variablennamen für den output umbenennen
   print(test)
 } 
 ```
@@ -109,7 +110,7 @@ Da es sich sowohl bei Krummbeinigkeit als auch bei der Clanzugehörigkeit um ein
 chisq.test(orks$krummbeinigkeit, orks$clan)
 ```
 
-Bei dem Chi-Quadrat Test besagt die Nullhypothese, dass die beiden Variablen unabhängig voneinander sind. Da p hier größer als 0,05 ist behalte ich die Nullhypothese bei. Gemäß der Aufgabenstellung besteht hier auch keine Notwendigkeit mehr, die Stärke des Zusammenhanges zu ermitteln. 
+Bei dem Chi-Quadrat Test besagt die Nullhypothese, dass die beiden Variablen unabhängig voneinander sind. Da p hier größer als 0,05 ist behalte ich die Nullhypothese bei. Gemäß der Aufgabenstellung besteht nun keine Notwendigkeit mehr, die Stärke des Zusammenhanges zu ermitteln. 
 
 # Aufgabe 4
 **Sie erinnern sich, dass Krummbeinigkeit ja auch eine Folge von Vitamin-D-Mangel sein kann. Bekanntermaßen ist Vitamin-D-Mangel in Orkpopulationen ein gravierendes Problem, weil Orks in Ihren Höhlen zu wenig Sonnenlicht abbekommen. Ein Glück haben Sie die 25-Hydroxy-Vitamin-D Serumkonzentration im Blut aufgenommen! Vielleicht hängt der sportliche Erfolg eines Orks ja von dem Vitamin-D-Mangel ab. Sie entschließen sich den Zusammenhang zwischen der 25-Hydroxy-Vitamin-D-Serumkonzentration und dem Erfolg im Elfwegschiessen eingehender zu untersuchen.**  
@@ -118,6 +119,7 @@ Bei dem Chi-Quadrat Test besagt die Nullhypothese, dass die beiden Variablen una
 Sowohl bei der Distanz beim Elfwegschiessen als auch bei der 25-Hydroxy-Vitamin-D-Serumkonzentration handelt es sich um metrische Variablen. Ein Streudiagramm ist geeignet um das Verhältnis zwischen diesen Merkmalen zu betrachten. 
 
 ```{r streudiagramm}    
+# Streudiagramm
 ggplot(data = orks, aes(x = HVDS, y = elfwegschiessen_m)) +
   geom_point() +  
   labs(x =  "25-Hydroxy-Vitamin-D-Serumkonzentration",                            
@@ -129,11 +131,10 @@ In dem Streudiagramm ist zu erkennen, dass je höher die 25-Hydroxy-Vitamin-D-Se
 Diese Vermutung soll durch ein geeignetes Verfahren überprüft werden. Für die Methodenauswahl, möchte ich vorab wissen, ob die Daten normalverteilt sind. Zu diesem Zweck werden die Daten als densityplot visualisiert und durch einen Shapiro-Wilks-Test überprüft. 
 
 ```{r hvds normalverteilung}
-# Die Schleife iteriert hier Spalten und nicht wie in den voran gegangenem Beispielen über eine Gruppenvariable
 # In einem ersten Schritt lege ich einen neuen dataframe an. Dieser enthält die Beschriftung der x-Achse sowie den Diagrammtitel.  
 df <- data.frame(HVDS = c("25-Hydroxy-Vitamin-DSerumkonzentration", "Densityplot der HVDS-Werte"), 
   elfwegschiessen_m = c("Elfwegschiessen (m)", "Densityplot der beim Elfwegschießen erzielten Distanzen"))
-# Nun kann ich mir einiges an Code sparen, indem ich einfach über die beiden Variablen iteriere 
+# Nun kann ich mir einiges an Code sparen, indem ich einfach über die beiden Variablen aus dem neuen Datafrane iteriere 
 for (var in names(df)){
   print(ggplot(data = orks, aes(x = orks[, var])) +
            geom_density() + 
@@ -145,12 +146,13 @@ for (var in names(df)){
          print(test)
          }
 ```
-Im Ergebnis ergeben ist sowohl die Variable des Elfwegschießens als auch für die HVDS-Werte p > 0,05. Dementsprechend behalte ich hier die Nullhypothese bei. Im Ergebnis gehe ich nun davon aus, dass die beiden metrischen Variablen normalverteilt sind. Somit kann man für diese Analyse sehr gut Pearsons r einsetzten.  
+Im Ergebnis ist p sowohl für die Variable des Elfwegschießens als auch für die HVDS-Werte größer als 0,05. Dementsprechend behalte ich hier die Nullhypothese bei. Daher gehe ich nun davon aus, dass die beiden metrischen Variablen normalverteilt sind. Somit kann man für diese Analyse sehr gut Pearsons r einsetzten.  
 
 ```{r hvds_elfweg pearson}
+# Pearsons r 
 cor.test(orks$elfwegschiessen_m, orks$HVDS, method = "pearson", alternative = "two.sided")
 ```
-Im Ergebnis besagt die Teststatistik, dass es mit p < 0,01 einen **höchstsignifikanten** Zusammenhang gibt. Pearsons r beträgt 0,56 und dies lässt sich im Sinne eines mittelstarken Zusammenhanges interpretieren. 
+Pearsons r zeigt mit 0,56 einen mittelstarken Zusammenhanges auf. Dieser Zusammenhang ist mit p < 0,01 **höchstsignifikant**. 
 
 # Aufgabe 5
 **Die unterschiedlichen HVDS-Werte der Orks lassen Ihnen keine Ruhe. Sind einige Orks tatsächlich öfter in der Sonne als andere oder gleichen die Höhlenbewohner ihr Defizit über die Nahrung aus? Ihnen kommt ein schrecklicher Verdacht….**  
@@ -173,9 +175,10 @@ Das Boxplot zeigt sehr deutlich, dass die 25-Hydroxy-Vitamin-D-Serumkonzentratio
 Um die weitere Vorgehensweise zu entscheiden, werden auch diese Daten auf Normalverteilung geprüft. Zusätzlich wird hier auch der Levene-Test durchgeführt, der die Homogenität der Varianzen prüft.  
 
 ```{r normalverteilung levene}
+# Überprüfung der Normalverteilung
 # Vektor mit den Merkmalsausprägungen der kategorialen Variable
 kanni <- unique(orks$kannibalismus)
-# Nun kann man über diese Merkmalsausräungen iterieren
+# Nun kann man über diese Merkmalsauspräungen iterieren
 for (k in kanni){
   hvds_kanni <- filter(orks, kannibalismus == k)
   print(ggplot(data = hvds_kanni, aes(x = HVDS)) +
@@ -186,12 +189,13 @@ for (k in kanni){
   test <- shapiro.test(hvds_kanni$HVDS)
   test$data.name <- paste("HVDS-Werte für die Kategorie", k)
 } 
-
+# Überprüfung der Varianzhomogenität 
 leveneTest(data = orks, HVDS ~ kannibalismus, na.rm = TRUE)
 ```
-Es handelt sich hier um eine unabhängige Stichprobe mit metrischen Daten in mehr als 2 Kategorien. Die metrische Variable ist Normalverteilt und erfüllt das Kriterium der Varianzhomogenität. Daher stellt die ANOVA hier eine geeignete Methode dar, um die Datenserie auf Unterschiede zu prüfen.    
+Es handelt sich hier um eine unabhängige Stichprobe mit metrischen Daten in mehr als 2 Kategorien. Die metrische Variable ist normalverteilt und erfüllt das Kriterium der Varianzhomogenität. Daher stellt die ANOVA hier eine geeignete Methode dar, um die Datenserie auf Unterschiede zu prüfen.    
 
 ```{r ANOVA}
+# ANOVA
 res.aov <- aov(HVDS ~ kannibalismus, data = orks)
 summary(res.aov)
 ```
@@ -201,24 +205,27 @@ Dem Ergebnis der ANOVA folgend, handelt es sich hier nicht um zufallsbedingte Sc
 **Bei jeder Orkylade stellt es ein Problem dar, dass die Orks so schlechte Verlierer sind. In Anbetracht der hohen Todesraten unter den Schiedsrichtern, möchte wirklich niemand einem Ork mitteilen, dass er nicht der Gewinner ist. Am besten ist es wohl, wenn man die Vergleiche unter den Orks einem Programm überlässt. Glauben Sie mir, dies wird unsere Lebenserwartung steigern!**  
 **Schreiben Sie eine Funktion. Diese nimmt die orks-Tabelle als input. Die Funktion gibt eine neue Tabelle aus, welche das Verhältnis von konkordanten zu diskonkordanten Paaren aufzeigt. Die Tabelle kann so aufgebaut sein, wie das Beispiel von Folie 10 aus der Korrelationspräsentation. Diese Tabelle hatte die Spalten: Vergleichspaar, Zwergenweitwurf, Elfwegschiessen, Konkordant und Diskonkordant.**  
 **Vorüberlegung**: 
-# Ich habe mir für diese Aufgabe erst einmal eine Matrix vorgestellt. In dieser werden die Orks einander in Spalten und Zeilen gegenübergestell. Als Beispiel beschränke ich mich hier erstmal auf die ersten 5 orks. 
-```{r knobel matrix}
+Ich habe mir für diese Aufgabe erst einmal eine Matrix vorgestellt. In dieser werden die Orks einander in Spalten und Zeilen gegenübergestellt. Als Beispiel beschränke ich mich hier erstmal auf die ersten 5 orks. 
+```{r beispielmatrix}
+# Beispielmatrix 
 first_five <- orks$name[1:5]
 mtx <- matrix(rep("vgl.",each=5*5),
               nrow = 5,
               ncol = 5,
               dimnames = list(first_five,
                               c(first_five)))
-kable(mtx)
+kable(mtx) # schöne Tabelle
 ```
-Diese Matrix hat nun viel zu viele Einträge. In der Diagonalen wird hier beispielsweise jeder Ork sich selbst gegenübergestellt. Ich möchste aber nicht jeden Ork mit sich selbst vergleichen! Blöd ist auch, dass die Orks immer zweimal miteinder verglichen werden. So wird beispielsweise Dabu Shouth sowohl in Zeile 1, Spalte 2 wie auch in Zeile 1, Spalte 1 mit Spathu Traiz verglichen. Um all diese ungewollten Vergleiche zu eliminieren, ersetze ich die Einträge in der Hauptdiagonalen und in dem darunter liegenden dreiceickigen Bereich durch einen leeren String. Und **et voilà** nun habe ich ein Schema nach dem ich meine Funktion aufbauen kann. 
+Diese Matrix hat nun viel zu viele Einträge. In der Diagonalen wird hier beispielsweise jeder Ork sich selbst gegenübergestellt. Ich möchste aber nicht jeden Ork mit sich selbst vergleichen! Blöd ist auch, dass die Orks immer zweimal miteinder verglichen werden. So wird beispielsweise Dabu Shouth sowohl in Zeile 1, Spalte 2 wie auch in Zeile 1, Spalte 1 mit Spathu Traiz verglichen. Um all diese ungewollten Vergleiche zu eliminieren, ersetze ich die Einträge in der Hauptdiagonalen und in dem darunter liegenden dreieckigen Bereich durch einen leeren String. Und **et voilà** nun habe ich ein Schema nach dem ich meine Funktion aufbauen kann. 
 
-```{r}
+```{r dreiecksmatrix}
+# Dreiecksmatrix
 mtx[lower.tri(mtx, diag = TRUE)] <- ""
 kable(mtx)
 ```
 Die Funktion basiert im Prinzip auf einer geschachtelten Schleife. Die äußere Schleife iteriert über den ersten bis hin zum vorletzten Ork. Mit jeder dieser Iterationen, wird die innere Schleife ausgeführt. Dabei wird der entsprechende Ork mit den Orks vergleichen, die in der Input-Tabelle folgen. Auf diese Art und Weise folge ich dem Schema aus der oben gezeigten Dreiecksmatrix. Beispiel: mit der ersten Iteration wird der Ork aus Zeile 1 mit den Orks aus Zeile 2-100 verglichen. Dann wird der Ork aus Zeile 2 mit den Orks aus Zeile 3-100 vergleichen usw. Die letzte Iteration vergleicht den Ork aus Zeile 99 mit dem Ork aus Zeile 100. 
 ```{r}
+# Funktionsdefinition
 vgl_orks <- function(orkylade) {
   # Die Ergebnistabelle soll die folgenden Spalten haben: 
   Vergleichspaar <- c()
@@ -254,12 +261,14 @@ vgl_orks <- function(orkylade) {
 ```
 Soweit so gut, nun wende ich die Funktion an. 
 ```{r anwendung}
+# Anwendung der Funktion
 output <- vgl_orks(orks)
 kable(output [1:10,])
 ```
 
 Ok, das sieht ja erstmal ganz gut aus. Aber auch hier kann ein Test nicht schaden! 
 ```{r}
+# Test
 # Dem Schema der Dreieckscksmatrix folgend, kann man die erwartete Anzahl an Paaren so berechnen: 
 anz_paare <- nrow(orks)*(nrow(orks)-1)/2
 anz_paare
@@ -270,3 +279,4 @@ nrow(output)
 # Das vergleichen wir nun mit dem Wert, den R uns ausgibt 
 cor(orks$elfwegschiessen_m, orks$zwergenweitwurf_m, method = "kendall")
 ```
+Bei Kendalls Tau gleichen sich die Ergebniss bis auf die dritte Kommastelle. Das reicht mir :-) 
