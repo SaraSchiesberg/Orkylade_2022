@@ -1,11 +1,13 @@
+# **Musterlösungen für die Orkylade 2022**
+
 Hier ist eine Musterlösungen für die sportwissenschaftliche Auswertung
 der Orkylade 2022. Ich folge hier dem Styleguide aus dem Buch [Advanced
 R](http://adv-r.had.co.nz/Style.html) von Hadley Wickham. Das Skript
-beginnt mit einem kleinem Codchunk zum Septup. Dann werden die Daten
+beginnt mit einem kleinem Codchunk zum Setup. Dann werden die Daten
 eingelesen und überprüft.
 
     # Pakete einlesen
-    library(car) # für den Levene-Test
+    library(car) # Levene-Test
     library(knitr) # schöne Tabellen
     library(tidyverse) # beinhaltet verschiedene Pakte: z. B. dplyr und ggplot2
     # Default Chunk-Option festlegen
@@ -101,11 +103,11 @@ ich den Shapiro-Wilks Test aus.
     # Shapiro-Wilks-Test
     # Vektor mit den Merkmalsausprägungen der kategorialen Variable
     clans <- unique(orks$clan)
-    # Nun kann man über diese Merkmalsausräungen iterieren
+    # Nun kann man über diese Merkmalsausprägungen iterieren
     for (clan in clans){
       clan_koerp <- filter(orks, clan == clan)
       test <- shapiro.test(clan_koerp$koerperhoehe)
-             test$data.name <- paste("Körperhöhen für den Clan", clan) # Variablennamen für den output umbenannen
+             test$data.name <- paste("Körperhöhen für den Clan", clan) # Variablennamen für den output umbenennen
       print(test)
     } 
 
@@ -175,7 +177,7 @@ durchgeführt.
 Bei dem Chi-Quadrat Test besagt die Nullhypothese, dass die beiden
 Variablen unabhängig voneinander sind. Da p hier größer als 0,05 ist
 behalte ich die Nullhypothese bei. Gemäß der Aufgabenstellung besteht
-hier auch keine Notwendigkeit mehr, die Stärke des Zusammenhanges zu
+nun keine Notwendigkeit mehr, die Stärke des Zusammenhanges zu
 ermitteln.
 
 # Aufgabe 4
@@ -198,6 +200,7 @@ Sowohl bei der Distanz beim Elfwegschiessen als auch bei der
 Variablen. Ein Streudiagramm ist geeignet um das Verhältnis zwischen
 diesen Merkmalen zu betrachten.
 
+    # Streudiagramm
     ggplot(data = orks, aes(x = HVDS, y = elfwegschiessen_m)) +
       geom_point() +  
       labs(x =  "25-Hydroxy-Vitamin-D-Serumkonzentration",                            
@@ -215,11 +218,10 @@ wissen, ob die Daten normalverteilt sind. Zu diesem Zweck werden die
 Daten als densityplot visualisiert und durch einen Shapiro-Wilks-Test
 überprüft.
 
-    # Die Schleife iteriert hier Spalten und nicht wie in den voran gegangenem Beispielen über eine Gruppenvariable
     # In einem ersten Schritt lege ich einen neuen dataframe an. Dieser enthält die Beschriftung der x-Achse sowie den Diagrammtitel.  
     df <- data.frame(HVDS = c("25-Hydroxy-Vitamin-DSerumkonzentration", "Densityplot der HVDS-Werte"), 
       elfwegschiessen_m = c("Elfwegschiessen (m)", "Densityplot der beim Elfwegschießen erzielten Distanzen"))
-    # Nun kann ich mir einiges an Code sparen, indem ich einfach über die beiden Variablen iteriere 
+    # Nun kann ich mir einiges an Code sparen, indem ich einfach über die beiden Variablen aus dem neuen Datafrane iteriere 
     for (var in names(df)){
       print(ggplot(data = orks, aes(x = orks[, var])) +
                geom_density() + 
@@ -247,12 +249,13 @@ Daten als densityplot visualisiert und durch einen Shapiro-Wilks-Test
     ## data:  elfwegschiessen_m
     ## W = 0.98571, p-value = 0.3569
 
-Im Ergebnis ergeben ist sowohl die Variable des Elfwegschießens als auch
-für die HVDS-Werte p &gt; 0,05. Dementsprechend behalte ich hier die
-Nullhypothese bei. Im Ergebnis gehe ich nun davon aus, dass die beiden
+Im Ergebnis ist p sowohl für die Variable des Elfwegschießens als auch
+für die HVDS-Werte größer als 0,05. Dementsprechend behalte ich hier die
+Nullhypothese bei. Daher gehe ich nun davon aus, dass die beiden
 metrischen Variablen normalverteilt sind. Somit kann man für diese
 Analyse sehr gut Pearsons r einsetzten.
 
+    # Pearsons r 
     cor.test(orks$elfwegschiessen_m, orks$HVDS, method = "pearson", alternative = "two.sided")
 
     ## 
@@ -267,10 +270,8 @@ Analyse sehr gut Pearsons r einsetzten.
     ##       cor 
     ## 0.5625545
 
-Im Ergebnis besagt die Teststatistik, dass es mit p &lt; 0,01 einen
-**höchstsignifikanten** Zusammenhang gibt. Pearsons r beträgt 0,56 und
-dies lässt sich im Sinne eines mittelstarken Zusammenhanges
-interpretieren.
+Pearsons r zeigt mit 0,56 einen mittelstarken Zusammenhanges auf. Dieser
+Zusammenhang ist mit p &lt; 0,01 **höchstsignifikant**.
 
 # Aufgabe 5
 
@@ -304,9 +305,10 @@ entscheiden, werden auch diese Daten auf Normalverteilung geprüft.
 Zusätzlich wird hier auch der Levene-Test durchgeführt, der die
 Homogenität der Varianzen prüft.
 
+    # Überprüfung der Normalverteilung
     # Vektor mit den Merkmalsausprägungen der kategorialen Variable
     kanni <- unique(orks$kannibalismus)
-    # Nun kann man über diese Merkmalsausräungen iterieren
+    # Nun kann man über diese Merkmalsauspräungen iterieren
     for (k in kanni){
       hvds_kanni <- filter(orks, kannibalismus == k)
       print(ggplot(data = hvds_kanni, aes(x = HVDS)) +
@@ -320,6 +322,7 @@ Homogenität der Varianzen prüft.
 
 ![](Musterlösung_files/figure-markdown_strict/normalverteilung%20levene-1.png)![](Musterlösung_files/figure-markdown_strict/normalverteilung%20levene-2.png)![](Musterlösung_files/figure-markdown_strict/normalverteilung%20levene-3.png)![](Musterlösung_files/figure-markdown_strict/normalverteilung%20levene-4.png)
 
+    # Überprüfung der Varianzhomogenität 
     leveneTest(data = orks, HVDS ~ kannibalismus, na.rm = TRUE)
 
     ## Levene's Test for Homogeneity of Variance (center = median: TRUE)
@@ -328,11 +331,12 @@ Homogenität der Varianzen prüft.
     ##       96
 
 Es handelt sich hier um eine unabhängige Stichprobe mit metrischen Daten
-in mehr als 2 Kategorien. Die metrische Variable ist Normalverteilt und
+in mehr als 2 Kategorien. Die metrische Variable ist normalverteilt und
 erfüllt das Kriterium der Varianzhomogenität. Daher stellt die ANOVA
 hier eine geeignete Methode dar, um die Datenserie auf Unterschiede zu
 prüfen.
 
+    # ANOVA
     res.aov <- aov(HVDS ~ kannibalismus, data = orks)
     summary(res.aov)
 
@@ -362,18 +366,19 @@ aufgebaut sein, wie das Beispiel von Folie 10 aus der
 Korrelationspräsentation. Diese Tabelle hatte die Spalten:
 Vergleichspaar, Zwergenweitwurf, Elfwegschiessen, Konkordant und
 Diskonkordant.**  
-**Vorüberlegung**: \# Ich habe mir für diese Aufgabe erst einmal eine
+**Vorüberlegung**: Ich habe mir für diese Aufgabe erst einmal eine
 Matrix vorgestellt. In dieser werden die Orks einander in Spalten und
-Zeilen gegenübergestell. Als Beispiel beschränke ich mich hier erstmal
+Zeilen gegenübergestellt. Als Beispiel beschränke ich mich hier erstmal
 auf die ersten 5 orks.
 
+    # Beispielmatrix 
     first_five <- orks$name[1:5]
     mtx <- matrix(rep("vgl.",each=5*5),
                   nrow = 5,
                   ncol = 5,
                   dimnames = list(first_five,
                                   c(first_five)))
-    kable(mtx)
+    kable(mtx) # schöne Tabelle
 
 <table>
 <colgroup>
@@ -445,10 +450,11 @@ Orks immer zweimal miteinder verglichen werden. So wird beispielsweise
 Dabu Shouth sowohl in Zeile 1, Spalte 2 wie auch in Zeile 1, Spalte 1
 mit Spathu Traiz verglichen. Um all diese ungewollten Vergleiche zu
 eliminieren, ersetze ich die Einträge in der Hauptdiagonalen und in dem
-darunter liegenden dreiceickigen Bereich durch einen leeren String. Und
+darunter liegenden dreieckigen Bereich durch einen leeren String. Und
 **et voilà** nun habe ich ein Schema nach dem ich meine Funktion
 aufbauen kann.
 
+    # Dreiecksmatrix
     mtx[lower.tri(mtx, diag = TRUE)] <- ""
     kable(mtx)
 
@@ -526,6 +532,7 @@ wird der Ork aus Zeile 2 mit den Orks aus Zeile 3-100 vergleichen usw.
 Die letzte Iteration vergleicht den Ork aus Zeile 99 mit dem Ork aus
 Zeile 100.
 
+    # Funktionsdefinition
     vgl_orks <- function(orkylade) {
       # Die Ergebnistabelle soll die folgenden Spalten haben: 
       Vergleichspaar <- c()
@@ -561,6 +568,7 @@ Zeile 100.
 
 Soweit so gut, nun wende ich die Funktion an.
 
+    # Anwendung der Funktion
     output <- vgl_orks(orks)
     kable(output [1:10,])
 
@@ -658,6 +666,7 @@ Soweit so gut, nun wende ich die Funktion an.
 Ok, das sieht ja erstmal ganz gut aus. Aber auch hier kann ein Test
 nicht schaden!
 
+    # Test
     # Dem Schema der Dreieckscksmatrix folgend, kann man die erwartete Anzahl an Paaren so berechnen: 
     anz_paare <- nrow(orks)*(nrow(orks)-1)/2
     anz_paare
@@ -678,3 +687,6 @@ nicht schaden!
     cor(orks$elfwegschiessen_m, orks$zwergenweitwurf_m, method = "kendall")
 
     ## [1] 0.2819036
+
+Bei Kendalls Tau gleichen sich die Ergebniss bis auf die dritte
+Kommastelle. Das reicht mir :-)
