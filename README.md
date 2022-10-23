@@ -1,2 +1,2 @@
 # Orkylade_2022
-Das Projekt beinhaltet die Aufgabenstellung und eine Musterlösung für die Abschlussarbeit im Rahmen der Veranstaltung "Statistik in den BioGeowissenschaften", die ich im August 2022 an der Universität Koblenz gehalten habe. 
+Im August 2022 habe ich an der Universität Koblenz "Statistik in den BioGeowissenschaften" gelehrt. Die repository "Orkylade 2022"" beinhaltet Materialien zur Abschlussprüfung. Dazu zählt die Aufgabenstellung, ein Skript zur Simulation der Datensätze und eine r-Markdown-Datei mit einer Musterlösungen. 
