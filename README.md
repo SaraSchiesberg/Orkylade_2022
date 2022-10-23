@@ -1,1 +1,2 @@
 # Orkylade_2022
+Das Projekt beinhaltet die Aufgabenstellung und eine Musterlösung für die Abschlussarbeit im Rahmen der Veranstaltung "Statistik in den BioGeowissenschaften", die ich im August 2022 an der Universität Koblenz gehalten habe. 
