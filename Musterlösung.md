@@ -1,7 +1,10 @@
 # **Musterlösungen für die Orkylade 2022**
 
 Hier ist eine Musterlösungen für die sportwissenschaftliche Auswertung
-der Orkylade 2022. Ich folge hier dem Styleguide aus dem Buch [Advanced
+der Orkylade 2022. Die Antworten illustrieren die methodische
+Vorgehensweise. Im Detail wird es Abweichungen zu Ihren Lösungen geben,
+weil jeder mit einem individuellen Datensatz gearbeitet hat.  
+Ich folge hier dem Styleguide aus dem Buch [Advanced
 R](http://adv-r.had.co.nz/Style.html) von Hadley Wickham. Das Skript
 beginnt mit einem kleinem Codchunk zum Setup. Dann werden die Daten
 eingelesen und überprüft.
